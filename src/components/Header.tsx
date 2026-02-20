@@ -4,6 +4,7 @@ import { useAppStore } from '../stores/useAppStore'
 import type { FormEvent } from "react"
 import { useState } from 'react'
 
+
 export default function Header() {
     const [searchFilters, setSearchFilter] = useState({
         ingredient:'',
@@ -15,6 +16,7 @@ export default function Header() {
     const fetchCategories= useAppStore((state) => state.fetchCategories)
     const categories = useAppStore((state)=>state.categories)
     const searchRecipes = useAppStore((state=>state.searchRecipes))
+    const showNotification = useAppStore((state) => state.showNotification)
 
     useEffect (() =>{
         fetchCategories()
@@ -30,7 +32,10 @@ export default function Header() {
         e.preventDefault()
 
         if (Object.values(searchFilters).includes("")) {
-            console.log("Todos los campos son obligatorios")
+            showNotification({
+                            text:'Todos los campos son obligatorios',
+                             error:true                           
+                        })
             return
         }
     searchRecipes(searchFilters)

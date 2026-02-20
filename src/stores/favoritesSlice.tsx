@@ -1,6 +1,7 @@
 import type {StateCreator} from 'zustand'
 import type { Recipe } from '../types'
-import type { ZodVoidDef } from 'zod/v3'
+
+import { createNotificationSlice, type NotificationSliceType } from './notificationSlice'
 
 export type FavoriteSliceType ={
     favorites: Recipe[]
@@ -9,7 +10,7 @@ export type FavoriteSliceType ={
     loadFromStorage: () => void
 }
 
-export const createFavoriteSlice : StateCreator<FavoriteSliceType> =(set,get) =>({
+export const createFavoriteSlice : StateCreator<FavoriteSliceType & NotificationSliceType , [], [] , FavoriteSliceType> =(set,get,api) =>({
     favorites:[],
     handleClickFavorite: (recipe) =>{
         if(get().favoriteExist(recipe.idDrink)){
@@ -17,11 +18,18 @@ export const createFavoriteSlice : StateCreator<FavoriteSliceType> =(set,get) =>
             set((state)=> ({
                 favorites: state.favorites.filter(favorite => favorite.idDrink !== recipe.idDrink)
             }))
-            
+            createNotificationSlice(set,get,api).showNotification({
+                text:'Se elimino de favoritos',
+                 error:false
+            })
         }else{
             set((state)=> ({
                 favorites:[...state.favorites , recipe]
             }))
+            createNotificationSlice(set,get,api).showNotification({
+                text:'Se agrego a favoritos',
+                 error:false
+            })
         }
         localStorage.setItem('favorites',JSON.stringify(get().favorites))
     },
